@@ -7,6 +7,38 @@
 
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+
+
+int check_value(char *field, char *value) 
+{
+    char *field_lower = toLower(field);
+    if (strcmp(field_lower, "first name") == 0) {
+        return validate_first_name(value);
+    } else if (strcmp(field_lower, "last name") == 0) {
+        return validate_last_name(value);
+    } else if (strcmp(field_lower, "id") == 0) {
+        return validate_id_number(value);
+    } else if (strcmp(field_lower, "telephone") == 0) {
+        return validate_telephone(value);
+    } else if (strcmp(field_lower, "date") == 0) {
+        return validate_date(value);
+    } else if (strcmp(field_lower, "debt") == 0) {
+        return validate_debt(value);
+    }
+    return 0;
+}
+
+int check_field(char *input, char *field) 
+{
+    char *input_ = input;
+    char *pos = strstr(input_, field);
+    if (pos != NULL) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 int compare_float(float a, char *operator, char *value) 
 {
     float b = atof(value);
