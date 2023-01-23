@@ -7,7 +7,84 @@
 
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+int validate_debt(const char* debt_str) 
+{
+    char* end;
+    strtod(debt_str, &end);
+    if (debt_str == end) {  // input string is not a valid number
+        return 0;
+    }
+    while (*end) {
+        if (!isspace(*end)) {  // check if there are any non-whitespace characters after the number
+            return 0;
+        }
+        end++;
+    }
+    return 1;
+}
 
+int validate_first_name(char* name) 
+{
+    if(strlen(name) < 2) return 0; //can be changed to more names
+    if(!isalpha(name[0])) return 0;
+    int word_count = 1;
+    for (int i = 0; name[i]; i++) {
+        if (!isalpha(name[i]) && name[i] != ' ') return 0;
+        if (name[i] == ' ') {
+            word_count++;
+            if(!isalpha(name[i+1])) return 0;
+        }
+    }
+    if(word_count>2) return 0;
+    return 1;
+}
+
+int validate_debt_float(float debt)
+{
+    char debt_str[20];
+    snprintf(debt_str, sizeof(debt_str), "%f", debt);
+    char* end;
+    strtod(debt_str, &end);
+    if (debt_str == end) {  // input string is not a valid number
+        return 0;
+    }
+    while (*end) {
+        if (!isspace(*end)) {  // check if there are any non-whitespace characters after the number
+            return 0;
+        }
+        end++;
+    }
+    return 1;
+}
+
+int validate_last_name(char* last_name) 
+{
+    for (int i = 0; last_name[i]; i++) {
+        if (!isalpha(last_name[i]) && !(last_name[i] == ' ') && !(last_name[i] == '-') && !(last_name[i] == '.') && !(last_name[i] == '_') ) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int validate_id_number(char* id_number) 
+{
+    if(strlen(id_number) != 9) return 0;
+    for (int i = 0; id_number[i]; i++) {
+        if (!isdigit(id_number[i])) return 0;
+    }
+    return 1;
+}
+
+int validate_telephone(char* telephone) 
+{
+    if(strlen(telephone) != 10) return 0;
+    if(telephone[0] != '0') return 0;
+    for (int i = 1; telephone[i]; i++) {
+        if (!isdigit(telephone[i])) return 0;
+    }
+    return 1;
+}
 
 int check_value(char *field, char *value) 
 {
