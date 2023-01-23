@@ -7,6 +7,31 @@
 
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+char* toLower(char* s) 
+{
+    for(char *p=s; *p; p++) *p=tolower(*p);
+    return s;
+}
+
+int validate_date(char* date) 
+{
+    int day, month, year;
+
+    if (sscanf(date, "%d%*c%d%*c%d", &month, &day, &year) != 3) return 0;
+    
+    if (month < 1 || month > 12) return 0;
+    if (day < 1 || day > 31) return 0;
+    if (year < 0) return 0;
+    // mktime function to check if the extracted date is a valid date
+    struct tm tm = {0};
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+    time_t t = mktime(&tm);
+    if (t == -1) return 0;
+    return 1;
+}
+
 int validate_debt(const char* debt_str) 
 {
     char* end;
