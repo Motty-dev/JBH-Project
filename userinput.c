@@ -10,6 +10,17 @@
 #define INPUT_BUFFER_SIZE 256
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+
+
+
+void print_customer(Customer *c) 
+{
+    printf("+------------------------------------------------------+\n");
+    printf("| Name: %-5s %-5s | ID Number: %-20s  |\n", c->first_name, c->last_name, c->id_number);
+    printf("| Phone: %-5s | Debt: %-5.2lf | Date: %-10s  |\n", c->phone, c->debt, c->date);
+    printf("+------------------------------------------------------+\n");
+}
+
 void handle_set(char *input, Customer **head, char *file_name) 
 {
     char *token;
