@@ -10,8 +10,38 @@
 #define INPUT_BUFFER_SIZE 256
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+void save_to_csv(Customer *new_customer, char *file_name) 
+{
+    FILE *file;
+    file = fopen(file_name, "a");
+    if (file == NULL)
+    {
+        printf("Error opening file\n");
+        return;
+    }
+    fprintf(file, "\n%s,%s,%s,%s,%s,%.2f", new_customer->first_name, new_customer->last_name, new_customer->id_number, new_customer->phone, new_customer->date, new_customer->debt);
+    fclose(file);
+}
 
-
+int match_customer(Customer *c, char *field, char *operator, char *value) 
+{
+    if (strcmp(field, "first name") == 0) {
+        return compare_string(c->first_name, operator, value);
+    } else if (strcmp(field, "last name") == 0) {
+        return compare_string(c->last_name, operator, value);
+    } else if (strcmp(field, "phone") == 0) {
+        return compare_string(c->phone, operator, value);
+    } else if (strcmp(field, "debt") == 0) {
+        return compare_float(c->debt, operator, value);
+    } else if (strcmp(field, "date") == 0) {
+        return compare_date(c->date, operator, value);
+    } else if (strcmp(field, "id") == 0) {
+        return compare_string(c->id_number, operator, value);
+    } else {
+        return 0;
+    }
+    return 0;
+}
 
 void print_customer(Customer *c) 
 {
