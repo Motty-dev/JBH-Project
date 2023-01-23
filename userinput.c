@@ -10,6 +10,28 @@
 #define INPUT_BUFFER_SIZE 256
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+void handle_select(char *parameters, Customer *head) 
+{
+    char field[32], operator[4], value[64];
+    int ret = 1;
+    extract_field_operator_value(parameters, field, operator, value, &ret);
+    if (ret)
+    {   
+        int match_found = 0;
+        Customer *current = head;
+        while (current != NULL) {
+            if (match_customer(current, field, operator, value)) {
+                match_found++;
+                print_customer(current);
+            }
+            current = current->next;
+        }
+        printf("%d results found.\n",match_found);
+        if (!match_found) {
+            printf("No customer matching the query\n");
+        }
+    }  
+}
 
 void handle_input(Customer *head, char *file_name) 
 {
