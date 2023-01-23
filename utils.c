@@ -7,9 +7,63 @@
 
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
+int compare_float(float a, char *operator, char *value) 
+{
+    float b = atof(value);
+    if (strcmp(operator, "=") == 0) {
+        return a == b;
+    } else if (strcmp(operator, "!=") == 0) {
+        return a != b;
+    } else if (strcmp(operator, ">") == 0) {
+        return a > b;
+    } else if (strcmp(operator, "<") == 0) {
+        return a < b;
+    }else {
+        return 0;
+    }
+}
 
+int compare_string(char *field, char *operator, char *value) 
+{
+    if (strcmp(operator, "=") == 0) {
+        return strcmp(field, value) == 0;
+    } else if (strcmp(operator, "!=") == 0) {
+        return strcmp(field, value) != 0;
+    } else if (strcmp(operator, ">") == 0) {
+        return strcmp(field, value) > 0;
+    } else if (strcmp(operator, "<") == 0) {
+        return strcmp(field, value) < 0;
+    }else {
+        return 0;
+    }
+}
 
+int compare_date(const char *date1, char *operator, const char *date2) 
+{
+    struct tm tm1, tm2;
+    strptime(date1, "%d/%m/%Y", &tm1);
+    strptime(date2, "%d/%m/%Y", &tm2);
 
+    if (strcmp(operator, "=") == 0) {
+        return (tm1.tm_year == tm2.tm_year) && (tm1.tm_mon == tm2.tm_mon) && (tm1.tm_mday == tm2.tm_mday);
+    } else if (strcmp(operator, "!=") == 0) {
+        return !((tm1.tm_year == tm2.tm_year) && (tm1.tm_mon == tm2.tm_mon) && (tm1.tm_mday == tm2.tm_mday));
+    } else if (strcmp(operator, ">") == 0) {
+        if (tm1.tm_year > tm2.tm_year) return 1;
+        if (tm1.tm_year < tm2.tm_year) return 0;
+        if (tm1.tm_mon > tm2.tm_mon) return 1;
+        if (tm1.tm_mon < tm2.tm_mon) return 0;
+        return tm1.tm_mday > tm2.tm_mday;
+    } else if (strcmp(operator, "<") == 0) {
+        if (tm1.tm_year < tm2.tm_year) return 1;
+        if (tm1.tm_year > tm2.tm_year) return 0;
+        if (tm1.tm_mon < tm2.tm_mon) return 1;
+        if (tm1.tm_mon > tm2.tm_mon) return 0;
+        return tm1.tm_mday < tm2.tm_mday;
+    }else {
+        return 0;
+    }
+}
 
 void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret) 
 {
