@@ -69,14 +69,14 @@ void print_list(Customer *head)
     printf("************              List of customers's debts               ************\n");
     printf("*********                                                            *********\n");
     printf("+-----+----------------+------------+----------------+----------+------------+\n");
-    printf("| No. | Name           | ID         | Phone          | Date     | Debt       |\n");
+    printf("| No. | Name           | ID         | Phone          | Debt     | Date       |\n");
     printf("+-----+----------------+------------+----------------+----------+------------+\n");
 
     int i = 1;
     Customer *temp = head;
 
     while (temp != NULL) {
-        printf("| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->date,temp->debt);
+        printf("| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
         printf("+-----+----------------+------------+----------------+----------+------------+\n");
         temp = temp->next;
     }
