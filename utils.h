@@ -5,7 +5,7 @@ char* toLower(char* s);
 int validate_date(char* date);
 int validate_debt(const char* debt);
 int validate_first_name(char* name);
-int validate_debt_float(float debt);
+int validate_debt_float(const char *debt_str);
 int validate_last_name(char* last_name);
 int validate_id_number(char* id_number);
 int validate_telephone(char* telephone);

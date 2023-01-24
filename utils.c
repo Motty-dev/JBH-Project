@@ -64,20 +64,19 @@ int validate_first_name(char* name)
     return 1;
 }
 
-int validate_debt_float(float debt)
+int validate_debt_float(const char *debt_str) 
 {
-    char debt_str[20];
-    snprintf(debt_str, sizeof(debt_str), "%f", debt);
-    char* end;
-    strtod(debt_str, &end);
-    if (debt_str == end) {  // input string is not a valid number
-        return 0;
-    }
-    while (*end) {
-        if (!isspace(*end)) {  // check if there are any non-whitespace characters after the number
+    int dot_count = 0;
+    for (int i = 0; debt_str[i] != '\0'; i++) {
+        if (!(isdigit(debt_str[i]) || debt_str[i] == '.' || debt_str[i] == '-')) {
             return 0;
         }
-        end++;
+        if (debt_str[i] == '.') {
+            dot_count++;
+        }
+    }
+    if (dot_count > 1) {
+        return 0;
     }
     return 1;
 }
