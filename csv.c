@@ -21,7 +21,7 @@ void print_error_messages(char incorrect_lines[][1024], int num_errors)
 Customer parse_line(char *line_, Customer_error *err) 
 {
     char *line = line_;
-    Customer c = {};
+    Customer c = {0};
     char *token = strtok_r(line, ",", &line);
     if (token == NULL) {
         err->error = 1;

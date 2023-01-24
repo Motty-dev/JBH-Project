@@ -54,7 +54,7 @@ void print_customer(Customer *c)
 void handle_set(char *input, Customer **head, char *file_name) 
 {
     char *token;
-    Customer new_customer;
+    Customer new_customer ={0};
     int fields_count = 0;
     int first_name_set, last_name_set, id_set, phone_set, debt_set, date_set = 0;
 
