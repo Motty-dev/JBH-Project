@@ -51,6 +51,41 @@ void print_customer(Customer *c)
     printf("+------------------------------------------------------+\n");
 }
 
+int handle_field(char *token, char *field_name, Customer *new_customer)
+{
+    if(!validate_input(token, field_name)) return 0;
+
+    char *eq_sign = strchr(token, '=');
+    if(eq_sign == NULL) {
+        printf("Error: Invalid format. Missing '=' in %s field.\n", field_name);
+        return 0;
+    }
+    if (*(eq_sign + 1) == '\0') {
+        printf("Error: Invalid format. No value for %s field.\n", field_name);
+        return 0;
+    }
+    // copy value to correct field in Customer struct
+    if(strstr(token,"first name=")){
+        snprintf(new_customer->first_name, sizeof(new_customer->first_name), "%s", eq_sign + 1);
+    }else if(strstr(token,"last name=")){
+        snprintf(new_customer->last_name, sizeof(new_customer->last_name), "%s", eq_sign + 1);
+    }else if(strstr(token,"id=")){
+        snprintf(new_customer->id_number, sizeof(new_customer->id_number), "%s", eq_sign + 1);
+    }else if(strstr(token,"phone=")){
+        snprintf(new_customer->phone, sizeof(new_customer->phone), "%s", eq_sign + 1);
+    }else if(strstr(token,"date=")){
+        snprintf(new_customer->date, sizeof(new_customer->date), "%s", eq_sign + 1);
+    }else if(strstr(token,"debt=")){
+        if(eq_sign[1] == '\0' || !validate_debt_float(eq_sign + 1)){
+            printf("Error: Invalid value for debt field.\n");
+            return 0;
+        }
+        float debt = strtof(eq_sign + 1, NULL);
+        new_customer->debt = debt;      
+    }
+    return 1;
+}
+
 void handle_set(char *input, Customer **head, char *file_name) 
 {
     char *token;
