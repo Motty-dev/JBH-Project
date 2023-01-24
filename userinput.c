@@ -51,6 +51,30 @@ void print_customer(Customer *c)
     printf("+------------------------------------------------------+\n");
 }
 
+int check_missing_fields(const char* input) 
+{
+    int missing_fields = 0;
+    if (strstr(input, "first name=") == NULL) {
+        missing_fields++;
+    }
+    if (strstr(input, "last name=") == NULL) {
+        missing_fields++;
+    }
+    if (strstr(input, "id=") == NULL) {
+        missing_fields++;
+    }
+    if (strstr(input, "phone=") == NULL) {
+        missing_fields++;
+    }
+    if (strstr(input, "date=") == NULL) {
+        missing_fields++;
+    }
+    if (strstr(input, "debt=") == NULL) {
+        missing_fields++;
+    }
+    return missing_fields;
+}
+
 int validate_input(const char* input, const char* field_name) 
 {
     if(input == NULL || input[0] == '\0')
