@@ -6,8 +6,8 @@ This program is a simple customer management system that allows you to read cust
 
 To run the program:
 
-- make
--./main <file_name.txt>
+1. make
+2. ./main <file_name.txt>
 
 
 ## Operations
