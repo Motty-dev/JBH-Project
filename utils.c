@@ -115,7 +115,7 @@ int check_value(char *field, char *value)
     char *field_lower = toLower(field);
     if (strcmp(field_lower, "first name") == 0) {
         return validate_first_name(value);
-    } else if (strcmp(field_lower, "last name") == 0) {
+    } else if (strcmp(field_lower, "second name") == 0) {
         return validate_last_name(value);
     } else if (strcmp(field_lower, "id") == 0) {
         return validate_id_number(value);
@@ -201,7 +201,7 @@ int compare_date(const char *date1, char *operator, const char *date2)
 void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret) 
 {
     // Allowed fields array
-    char *allowed_fields[] = {"first name", "last name", "telephone", "id", "debt", "date"};
+    char *allowed_fields[] = {"first name", "second name", "telephone", "id", "debt", "date"};
     // Copy the input string to a temporary buffer
     char temp[strlen(input) + 1];
     strcpy(temp, input);

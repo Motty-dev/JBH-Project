@@ -42,7 +42,7 @@ Customer parse_line(char *line_, Customer_error *err)
     token = strtok_r(NULL, ",", &line);
     if (token == NULL) {
         err->error = 1;
-        sprintf(err->message, "Invalid line format: Missing last name field");
+        sprintf(err->message, "Invalid line format: Missing second name field");
         return c;
     }
     strncpy(c.last_name, token, sizeof(c.last_name) - 1);
@@ -51,7 +51,7 @@ Customer parse_line(char *line_, Customer_error *err)
     }
     if(!validate_last_name(c.last_name)) {
         err->error = 1;
-        sprintf(err->message, "Invalid last name format for customer %s", c.last_name);
+        sprintf(err->message, "Invalid second name format for customer %s", c.last_name);
         return c;
     }
     // id Number
