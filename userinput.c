@@ -51,6 +51,28 @@ void print_customer(Customer *c)
     printf("+------------------------------------------------------+\n");
 }
 
+int validate_input(const char* input, const char* field_name) 
+{
+    if(input == NULL || input[0] == '\0')
+    {
+       printf("Error: Empty Input\n");
+       return 0;
+    }
+    if (strchr(input, ' ') != strrchr(input, ' ')) {
+        printf("Error: Invalid format. No spaces before or after '=' in %s field.\n", field_name);
+        return 0;
+    }
+    if (strchr(input, '=') != strrchr(input, '=')) {
+        printf("Error: Invalid format. Only one '=' is allowed in %s field.\n", field_name);
+        return 0;
+    }
+    if (*(strchr(input, '=') + 1) == ' ') {
+        printf("Error: Invalid format. No spaces after '=' in %s field.\n", field_name);
+        return 0;
+    }
+    return 1;
+}
+
 int handle_field(char *token, char *field_name, Customer *new_customer)
 {
     if(!validate_input(token, field_name)) return 0;
