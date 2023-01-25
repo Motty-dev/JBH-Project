@@ -112,6 +112,7 @@ int handle_field(char *token, char *field_name, Customer *new_customer)
     }
     // copy value to correct field in Customer struct
     if(strstr(token,"first name=")){
+        toLower(eq_sign + 1);
         snprintf(new_customer->first_name, sizeof(new_customer->first_name), "%s", eq_sign + 1);
     }else if(strstr(token,"second name=")){
         snprintf(new_customer->last_name, sizeof(new_customer->last_name), "%s", eq_sign + 1);
@@ -209,7 +210,7 @@ void handle_set(char *input, Customer **head, char *file_name)
             } else {
                 prev->next = temp->next;
             }
-            
+
             insert_in_order(temp, head);
             printf("Debt was updated for customer: %s %s, from %.2f to %.2f\n", temp->first_name, temp->last_name, temp_s, temp->debt);
             break;
