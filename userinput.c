@@ -209,7 +209,7 @@ void handle_set(char *input, Customer **head, char *file_name)
             } else {
                 prev->next = temp->next;
             }
-            save_to_csv(&new_customer, file_name);
+            
             insert_in_order(temp, head);
             printf("Debt was updated for customer: %s %s, from %.2f to %.2f\n", temp->first_name, temp->last_name, temp_s, temp->debt);
             break;
@@ -254,7 +254,7 @@ void handle_input(Customer *head, char *file_name)
     char *cursor;
 
     // get input from the user
-    printf("Enter a command ( select / set / print / quit )\n > ");
+    printf("Enter a command ( select / set / print / quit ) :\n> ");
     fgets(input, INPUT_BUFFER_SIZE, stdin);
     input[strcspn(input, "\n")] = 0;
     cursor = input;
@@ -286,6 +286,6 @@ void handle_input(Customer *head, char *file_name)
     } else {
         printf("Error: '%s' is not a valid command. Allowed commands are select, set, print, quit, (witout spaces before).\n", command);
     }
-    printf("parameters:%s\n", parameters);
+
     free(parameters);
 }

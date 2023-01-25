@@ -76,7 +76,7 @@ void print_list(Customer *head)
     Customer *temp = head;
 
     while (temp != NULL) {
-        printf("| %-3d | %-10s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
+        printf("| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
         printf("+-----+----------------+------------+----------------+----------+------------+\n");
         temp = temp->next;
     }
