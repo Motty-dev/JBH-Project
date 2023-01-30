@@ -10,13 +10,13 @@
 #define INPUT_BUFFER_SIZE 256
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
-void save_to_csv(Customer *new_customer, char *file_name, char *buffer) 
+void save_to_csv(Customer *new_customer, char *file_name) 
 {
     FILE *file;
     file = fopen(file_name, "a");
     if (file == NULL)
     {
-        strcpy(buffer, "Error opening file\n");
+        printf("Error opening file\n");
         return;
     }
     fprintf(file, "\n%s,%s,%s,%s,%s,%.2f", new_customer->first_name, new_customer->last_name, new_customer->id_number, new_customer->phone, new_customer->date, new_customer->debt);
@@ -220,8 +220,8 @@ void handle_set(char *input, Customer **head, char *file_name, char *buffer)
     }
     if (!found) {
         build_list(new_customer, head);
-        save_to_csv(&new_customer, file_name, buffer);
-        puts("Added to list!");
+        save_to_csv(&new_customer, file_name);
+        strcpy(buffer,"Added new customer to the list!\n");
     }
 }
 
