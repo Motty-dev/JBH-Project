@@ -287,3 +287,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
     }
     *ret = 1;
 }
+
+void print_cb(char *string, int ignore) 
+{
+    printf("%s\n", string);
+}

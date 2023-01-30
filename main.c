@@ -14,16 +14,13 @@ int main(int argc, char *argv[])
     }
 
     Customer *head = NULL;
-    char buffer[1024];
-
+    
     process_file(argv[1], &head);
     print_list(head);
 
     while (1) 
     {   
-        menu_screen(head, argv[1], buffer);
-        printf("%s", buffer);
-        memset(buffer, 0, sizeof(buffer));
+        menu_screen(head, argv[1]);
     }
 
     free_list(head);
