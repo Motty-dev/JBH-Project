@@ -244,7 +244,7 @@ void handle_select(char *parameters, Customer *head, void(*cb)(char *, int), int
 {
     char field[32], operator[4], value[64], inner_buffer[1024];
     int ret = 1;
-    extract_field_operator_value(parameters, field, operator, value, &ret);
+    extract_field_operator_value(parameters, field, operator, value, &ret, cb, server_mode);
     if (ret)
     {   
         int match_found = 0;

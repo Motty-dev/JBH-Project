@@ -16,6 +16,6 @@ int validate_debt_float(const char *debt_str);
 int compare_float(float a, char *operator, char *value);
 int compare_string(char *field, char *operator, char *value);
 int compare_date(const char *date1, char *operator, const char *date2);
-void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret);
+void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret, void(*cb)(char *, int), int server_mode);
 
 #endif

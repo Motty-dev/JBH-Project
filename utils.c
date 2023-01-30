@@ -198,15 +198,16 @@ int compare_date(const char *date1, char *operator, const char *date2)
     }
 }
 
-void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret) 
+void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret, void(*cb)(char *, int), int server_mode) 
 {
-    // Allowed fields array
+    char inner_buffer[1024];
+
     char *allowed_fields[] = {"first name", "second name", "telephone", "id", "debt", "date"};
-    // Copy the input string to a temporary buffer
+    // copy the input string to a temporary buffer
     char temp[strlen(input) + 1];
     strcpy(temp, input);
 
-    // Extracting the field
+    // extracting the field
     char *op = strpbrk(temp, "<>!=");
     if (op) {
         int field_len = op - temp;
@@ -227,7 +228,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
             }
         }
         if (!valid_field) {
-            printf("Error: Check if field is correct and without spaces before and after operator\n");
+            strcpy(inner_buffer, "Error: Check if field is correct and without spaces before and after operator\n");
+            cb(inner_buffer, server_mode);
             strcpy(field, "");
             strcpy(operator, "");
             strcpy(value, "");
@@ -235,7 +237,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
             return;
         }
     } else {
-        printf("Error: Invalid format. use the format <field><operator><value> without spaces.\n");
+        strcpy(inner_buffer, "Error: Invalid format. use the format <field><operator><value> without spaces.\n");
+        cb(inner_buffer, server_mode);
         strcpy(field, "");
         strcpy(operator, "");
         strcpy(value, "");
@@ -244,7 +247,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
     }
     // check if the operator and value contain any spaces
     if (strchr(operator, ' ') != NULL || strchr(value, ' ') != NULL) {
-        printf("Error: Invalid format. use the format <field><operator><value> without spaces.\n");
+        strcpy(inner_buffer, "Error: Invalid format. use the format <field><operator><value> without spaces.\n");
+        cb(inner_buffer, server_mode);
         strcpy(field, "");
         strcpy(operator, "");
         strcpy(value, "");
@@ -253,7 +257,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
     }
     if(strlen(operator)==0 || strlen(value)==0)
     {
-        printf("Error: Missing operator or value.\n");
+        strcpy(inner_buffer, "Error: Missing operator or value.\n");
+        cb(inner_buffer, server_mode);
         strcpy(field, "");
         strcpy(operator, "");
         strcpy(value, "");
@@ -270,7 +275,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
         }
     }
     if (!valid_operator) {
-        printf("Error: Invalid operator. Allowed operators are <, >, !=, =.\n");
+        strcpy(inner_buffer, "Error: Invalid operator. Allowed operators are <, >, !=, =.\n");
+        cb(inner_buffer, server_mode);
         strcpy(field, "");
         strcpy(operator, "");
         strcpy(value, "");
@@ -278,7 +284,8 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
         return;
     }
     if (!check_value(field, value)) {
-        printf("Error: Invalid value for field '%s'.\n", field);
+        snprintf(inner_buffer, 1024, "Error: Invalid value for field '%s'.\n", field);
+        cb(inner_buffer, server_mode);
         strcpy(field, "");
         strcpy(operator, "");
         strcpy(value, "");
