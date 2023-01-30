@@ -10,11 +10,13 @@
 char incorrect_lines[MAX_ERROR_LINES][1024];
 int incorrect_lines_count = 0, correct_lines_count = 0, total_lines = 0;
 
-void print_error_messages(char incorrect_lines[][1024], int num_errors) 
+void print_error_messages(char incorrect_lines[][1024], int num_errors, void(*cb)(char *, int), int server_mode) 
 {
+    char inner_buffer[1024];
     int i;
     for (i = 0; i < num_errors; i++) {
-        printf("\n\tError %d: %s\n", i+1, incorrect_lines[i]);
+        snprintf(inner_buffer, 1024, "\n\tError %d: %s\n", i+1, incorrect_lines[i]);
+        cb(inner_buffer, server_mode);
     }
 }
 
@@ -114,11 +116,13 @@ Customer parse_line(char *line_, Customer_error *err)
     return c;
 }
 
-void process_file(char *file_name, Customer **head) 
+void process_file(char *file_name, Customer **head, void(*cb)(char *, int), int server_mode) 
 {
+    char inner_buffer[1024];
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
-        printf("Error opening file\n");
+        strcpy(inner_buffer, "Error opening file\n");
+        cb(inner_buffer, server_mode);
         return;
     }
 
@@ -137,11 +141,13 @@ void process_file(char *file_name, Customer **head)
         total_lines++;
     }
     if(incorrect_lines_count == 0) {
-        printf("\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
+        snprintf(inner_buffer, 1024, "\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
+        cb(inner_buffer, server_mode);
     }
     else {
-        printf("\n\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
-        print_error_messages(incorrect_lines, incorrect_lines_count);
+        snprintf(inner_buffer, 1024, "\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
+        cb(inner_buffer, server_mode);
+        print_error_messages(incorrect_lines, incorrect_lines_count,cb, server_mode );
     }
 
     fclose(file);

@@ -1,9 +1,12 @@
 #include "list.h"
 #include "csv.h"
 #include "userinput.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define SERVER_MODE 0
 
 int main(int argc, char *argv[]) 
 {
@@ -15,7 +18,7 @@ int main(int argc, char *argv[])
 
     Customer *head = NULL;
     
-    process_file(argv[1], &head);
+    process_file(argv[1], &head, &print_cb, SERVER_MODE );
     print_list(head);
 
     while (1) 

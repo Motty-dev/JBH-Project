@@ -10,7 +10,7 @@
 #define INPUT_BUFFER_SIZE 256
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
-void save_to_csv(Customer *new_customer, char *file_name,void(*cb)(char *, int), int server_mode) 
+void save_to_csv(Customer *new_customer, char *file_name, void(*cb)(char *, int), int server_mode) 
 {
     FILE *file;
     char inner_buffer[1024];
