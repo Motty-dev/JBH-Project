@@ -10,7 +10,7 @@
 #define INPUT_BUFFER_SIZE 256
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 
-void save_to_csv(Customer *new_customer, char *file_name,void(*cb)(char *, int)) 
+void save_to_csv(Customer *new_customer, char *file_name,void(*cb)(char *, int), int server_mode) 
 {
     FILE *file;
     char inner_buffer[1024];
@@ -18,7 +18,7 @@ void save_to_csv(Customer *new_customer, char *file_name,void(*cb)(char *, int))
     if (file == NULL)
     {
         strcpy(inner_buffer, "Error opening file\n");
-        cb(inner_buffer,0);
+        cb(inner_buffer,server_mode);
         return;
     }
     fprintf(file, "\n%s,%s,%s,%s,%s,%.2f", new_customer->first_name, new_customer->last_name, new_customer->id_number, new_customer->phone, new_customer->date, new_customer->debt);
@@ -69,47 +69,47 @@ int check_missing_fields(const char* input)
     return missing_fields;
 }
 
-int validate_input(const char* input, const char* field_name, void(*cb)(char*, int)) 
+int validate_input(const char* input, const char* field_name, void(*cb)(char*, int), int server_mode) 
 {
     char inner_buffer[1024];
     if(input == NULL || input[0] == '\0')
     {
        strcpy(inner_buffer, "Error: Empty Input\n");
-       cb(inner_buffer,0);
+       cb(inner_buffer,server_mode);
        return 0;
     }
     if (strchr(input, ' ') != strrchr(input, ' ')) {
         snprintf(inner_buffer, 1024, "Error: Invalid format. No spaces before or after '=' in %s field.\n", field_name);
-        cb(inner_buffer,0);
+        cb(inner_buffer,server_mode);
         return 0;
     }
     if (strchr(input, '=') != strrchr(input, '=')) {
         snprintf(inner_buffer, 1024, "Error: Invalid format. Only one '=' is allowed in %s field.\n", field_name);
-        cb(inner_buffer,0);
+        cb(inner_buffer,server_mode);
         return 0;
     }
     if (*(strchr(input, '=') + 1) == ' ') {
         snprintf(inner_buffer, 1024, "Error: Invalid format. No spaces after '=' in %s field.\n", field_name);
-        cb(inner_buffer,0);
+        cb(inner_buffer,server_mode);
         return 0;
     }
     return 1;
 }
 
-int handle_field(char *token, char *field_name, Customer *new_customer, void(*cb)(char*, int))
+int handle_field(char *token, char *field_name, Customer *new_customer, void(*cb)(char*, int), int server_mdoe)
 {
     char inner_buffer[1024];
-    if(!validate_input(token, field_name, cb)) return 0;
+    if(!validate_input(token, field_name, cb, server_mdoe)) return 0;
 
     char *eq_sign = strchr(token, '=');
     if(eq_sign == NULL) {
         snprintf(inner_buffer, 1024, "Error: Invalid format. Missing '=' in %s field.\n", field_name);
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mdoe);
         return 0;
     }
     if (*(eq_sign + 1) == '\0') {
         snprintf(inner_buffer, 1024, "Error: Invalid format. No value for %s field.\n", field_name);
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mdoe);
         return 0;
     }
     // copy value to correct field into customer struct
@@ -127,7 +127,7 @@ int handle_field(char *token, char *field_name, Customer *new_customer, void(*cb
     }else if(strstr(token,"debt=")){
         if(eq_sign[1] == '\0' || !validate_debt_float(eq_sign + 1)){
             strcpy(inner_buffer, "Error: Invalid value for debt field.\n");
-            cb(inner_buffer, 0);
+            cb(inner_buffer, server_mdoe);
             return 0;
         }
         float debt = strtof(eq_sign + 1, NULL);
@@ -136,7 +136,7 @@ int handle_field(char *token, char *field_name, Customer *new_customer, void(*cb
     return 1;
 }
 
-void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, int)) 
+void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, int), int server_mode) 
 {
     char inner_buffer[1024];
     char *token;
@@ -147,19 +147,19 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
     if(input == NULL || input[0] == '\0')
     {
        strcpy(inner_buffer, "Error: Empty Input\n");
-       cb(inner_buffer, 0);
+       cb(inner_buffer, server_mode);
        return;
     }
 
     missing_fields = check_missing_fields(input);
     if (missing_fields > 0) {
         snprintf(inner_buffer, 1024, "Error: Missing %d required fields.\n", missing_fields);
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
 
     while ((token = strtok_r(input, ",", &input)) != NULL) {
-        if (!handle_field(token, "", &new_customer, cb)) {
+        if (!handle_field(token, "", &new_customer, cb, server_mode)) {
             return;
         }
         fields_count++;
@@ -167,33 +167,33 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
 
     if (fields_count != 6) {
         snprintf(inner_buffer, 1024, "\nError: expected 6 fields, but got %d .\nCheck that you fill up all the fields\n {first name=,last name=,id=,phone=,date=,debt=}\n" , fields_count);
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
 
     if(!validate_first_name(new_customer.first_name)){
         strcpy(inner_buffer, "Wrong input value for first name field.\n");
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
     if(!validate_last_name(new_customer.last_name)){
         strcpy(inner_buffer, "Wrong input value for second name field.\n");
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
     if(!validate_telephone(new_customer.phone)){
         strcpy(inner_buffer, "Wrong input value for phone field.\n");
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
     if(!validate_date(new_customer.date)){
         strcpy(inner_buffer, "Wrong input value for date field.\n");
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
     if(!validate_id_number(new_customer.id_number)){
         strcpy(inner_buffer, "Wrong input value for id field.\n");
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
         return;
     }
     // add new customer to the list logic( after missing fields check )
@@ -205,13 +205,13 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
             found = 1;
             if(strcasecmp(temp->first_name, new_customer.first_name) != 0 || strcasecmp(temp->last_name, new_customer.last_name) != 0){
                 strcpy(inner_buffer, "This id already exist for a different customer.\n");
-                cb(inner_buffer, 0);
+                cb(inner_buffer, server_mode);
                 return;
             }else if((strcasecmp(temp->phone, new_customer.phone) != 0)){
                 //save_to_csv(&new_customer, file_name);
                 strcpy(temp->phone, new_customer.phone);
                 strcpy(inner_buffer, "User exist with different phone. debt was updated in the list and added to file.\n");
-                cb(inner_buffer, 0);
+                cb(inner_buffer, server_mode);
             }
             float temp_s = temp->debt;
             temp->debt += new_customer.debt;
@@ -227,7 +227,7 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
 
             insert_in_order(temp, head);
             snprintf(inner_buffer, 1024, "Debt was updated for customer: %s %s, from %.2f to %.2f\n", temp->first_name, temp->last_name, temp_s, temp->debt);
-            cb(inner_buffer, 0);
+            cb(inner_buffer, server_mode);
             break;
         }
         prev = temp;
@@ -235,12 +235,12 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
     }
     if (!found) {
         build_list(new_customer, head);
-        save_to_csv(&new_customer, file_name, cb);
+        save_to_csv(&new_customer, file_name, cb, server_mode);
         puts("Added to list!");
     }
 }
 
-void handle_select(char *parameters, Customer *head, void(*cb)(char *, int)) 
+void handle_select(char *parameters, Customer *head, void(*cb)(char *, int), int server_mode) 
 {
     char field[32], operator[4], value[64], inner_buffer[1024];
     int ret = 1;
@@ -253,14 +253,14 @@ void handle_select(char *parameters, Customer *head, void(*cb)(char *, int))
             if (match_customer(current, field, operator, value)) {
                 match_found++;
                 snprintf(inner_buffer, 1024, "+------------------------------------------------------+\n| Name: %-5s %-5s | ID Number: %-20s  |\n| Phone: %-5s | Debt: %-5.2lf | Date: %-10s  |\n+------------------------------------------------------+\n" ,current->first_name, current->last_name, current->id_number, current->phone, current->debt, current->date);
-                cb(inner_buffer, 0);
+                cb(inner_buffer, server_mode);
             }
             current = current->next;
         }
         printf("%d results found.\n",match_found);
         if (!match_found) {
             strcpy(inner_buffer,"No match found\n");
-            cb(inner_buffer, 0);
+            cb(inner_buffer, server_mode);
         }
     }  
 }
@@ -269,15 +269,18 @@ void menu_screen(Customer *head, char *file_name)
 {
     char input[INPUT_BUFFER_SIZE];
 
+    //set the server to send localy if menu_screen is called
+    int server_mode = 0;
+
     // get input from the user
     printf("Enter a command { > select > set > print > quit }\n > ");
     fgets(input, INPUT_BUFFER_SIZE, stdin);
     input[strcspn(input, "\n")] = 0;
 
-    handle_input(head, input, file_name, &print_cb);
+    handle_input(head, input, file_name, &print_cb, server_mode);
 }
 
-void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, int)) 
+void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, int), int server_mode) 
 {
     char command[16], *parameters=NULL;
     char inner_buffer[1024];
@@ -302,16 +305,16 @@ void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*,
     parameters[len] = '\0';
 
     if (strcmp(command, "select") == 0) {
-        handle_select(parameters, head, cb);
+        handle_select(parameters, head, cb, server_mode);
     } else if (strcmp(command, "set") == 0) {
-        handle_set(parameters, &head, file_name, cb);
+        handle_set(parameters, &head, file_name, cb, server_mode);
     } else if (strcmp(command, "print") == 0) {
         print_list(head);
     } else if (strcmp(command, "quit") == 0) {
         exit(0);
     } else {
         snprintf(inner_buffer,1024, "Error: '%s' is not a valid command. Allowed commands are select, set, print, quit.\n", command);
-        cb(inner_buffer, 0);
+        cb(inner_buffer, server_mode);
 
     }
 
