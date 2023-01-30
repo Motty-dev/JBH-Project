@@ -248,16 +248,23 @@ void handle_select(char *parameters, Customer *head)
     }  
 }
 
-void handle_input(Customer *head, char *file_name) 
+void menu_screen(Customer *head, char *file_name, char *buffer)
 {
     char input[INPUT_BUFFER_SIZE];
+
+    // get input from the user
+    printf("Enter a command { > select > set > print > quit }\n > ");
+    fgets(input, INPUT_BUFFER_SIZE, stdin);
+    input[strcspn(input, "\n")] = 0;
+
+    handle_input(head, input, file_name, buffer);
+}
+
+void handle_input(Customer *head, char *input, char *file_name, char *buffer) 
+{
     char command[16], *parameters=NULL;
     char *cursor;
 
-    // get input from the user
-    printf("Enter a command ( select / set / print / quit ) :\n> ");
-    fgets(input, INPUT_BUFFER_SIZE, stdin);
-    input[strcspn(input, "\n")] = 0;
     cursor = input;
 
     // extract the command
@@ -285,7 +292,7 @@ void handle_input(Customer *head, char *file_name)
     } else if (strcmp(command, "quit") == 0) {
         exit(0);
     } else {
-        printf("Error: '%s' is not a valid command. Allowed commands are select, set, print, quit, (witout spaces before).\n", command);
+        sprintf(buffer, "Error: '%s' is not a valid command. Allowed commands are select, set, print, quit.\n", command);
     }
 
     free(parameters);
