@@ -12,7 +12,7 @@ typedef struct customer {
 } Customer;
 
 void free_list(Customer *head);
-void print_list(Customer *head);
+void print_list(Customer *head, void(*cb)(char *, int), int server_mode);
 void build_list(Customer c, Customer **head);
 void insert_in_order(Customer *c, Customer **head);
 

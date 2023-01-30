@@ -309,7 +309,7 @@ void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*,
     } else if (strcmp(command, "set") == 0) {
         handle_set(parameters, &head, file_name, cb, server_mode);
     } else if (strcmp(command, "print") == 0) {
-        print_list(head);
+        print_list(head, cb, server_mode);
     } else if (strcmp(command, "quit") == 0) {
         exit(0);
     } else {

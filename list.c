@@ -62,15 +62,15 @@ void build_list(Customer c, Customer **head)
     }
 }
 
-void print_list(Customer *head) 
+void print_list(Customer *head, void(*cb)(char *, int), int server_mode) 
 {
-    printf("\n******************************************************************************\n");
-    printf("***************                                                ***************\n");
-    printf("************              List of customers's debts               ************\n");
-    printf("*********                                                            *********\n");
-    printf("+-----+----------------+------------+----------------+----------+------------+\n");
-    printf("| No. | Name           | ID         | Phone          | Debt     | Date       |\n");
-    printf("+-----+----------------+------------+----------------+----------+------------+\n");
+    cb("\n******************************************************************************\n", server_mode);
+    cb("***************                                                ***************\n", server_mode);
+    cb("************              List of customers's debts               ************\n", server_mode);
+    cb("*********                                                            *********\n", server_mode);
+    cb("+-----+----------------+------------+----------------+----------+------------+\n", server_mode);
+    cb("| No. | Name           | ID         | Phone          | Debt     | Date       |\n", server_mode);
+    cb("+-----+----------------+------------+----------------+----------+------------+\n", server_mode);
 
     int i = 1;
     Customer *temp = head;
