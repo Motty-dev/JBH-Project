@@ -5,26 +5,34 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include "list.h"
+#include "csv.h"
+#include "userinput.h"
+
+typedef struct thread_args {
+    Customer **head; 
+    char* file_name; 
+    int new_sock; 
+} thread_args;
 
 #define MAX_LEN 1024
 
-void socket_cb(char *buffer, int new_sock) 
+void send_cb(char *buffer, int new_sock) 
 {
     // send string through socket
     if (send(new_sock, buffer, strlen(buffer), 0) < 0) {
         printf("Send failed\n");
         return;
     }
-    printf("Data sent\n");
 }
 
 void *conn_handler(void *args)
 {
     char buffer[MAX_LEN];
     int n;
-    int new_sock = *(int*)args;
+    thread_args *targs = args;
     
-    n = recv(new_sock, buffer, MAX_LEN, 0);
+    n = recv(targs->new_sock, buffer, MAX_LEN, 0);
     if (n < 0)
     {
         perror("Server error receiving data");
@@ -33,17 +41,10 @@ void *conn_handler(void *args)
     buffer[n] = '\0';
     printf("Server received: %s\n", buffer);
     
-
     //buffer logic here - string from client
-
-//     n = send(new_sock, buffer, strlen(buffer), 0);
-//     if (n < 0)
-//     {
-//         perror("Server error sending data");
-//         goto exit;
-//     }
+    handle_input(*targs->head, buffer, targs->file_name, &send_cb, targs->new_sock);
 exit:
-    close(new_sock);
+    close(targs->new_sock);
     return NULL;
 }
 
@@ -58,6 +59,9 @@ int main(int argc, char **argv)
         puts("Usage: ./<file_name> <port> <file_name.txt>\n");
         return 1;
     }
+    // process file and create the list 
+    Customer *head = NULL;
+    process_file(argv[2], &head);
 
     // create a socket 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -95,7 +99,13 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        pthread_create(&tid, NULL, conn_handler, (void *)&new_sock);
+        thread_args args = {
+            .head = &head,
+            .file_name = argv[1],
+            .new_sock = new_sock
+        };
+
+        pthread_create(&tid, NULL, conn_handler, &args);
         pthread_join(tid, NULL);
     }
 

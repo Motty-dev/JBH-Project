@@ -73,7 +73,9 @@ int main(int argc, char **argv)
 
         for (i = 0; i < num_queries; i++)
         {
-            n = send(sockfd[i], buffer[i], strlen(buffer[i]), 0);
+            int r = 0;
+            strtok(buffer[i], "\n");
+            n = send(sockfd[i], buffer[i]+r, strlen(buffer[i]), 0);
             if (n < 0)
             {
                 perror("Client error sending data");
@@ -83,15 +85,22 @@ int main(int argc, char **argv)
 
         for (i = 0; i < num_queries; i++)
         {
-            n = recv(sockfd[i], buffer[i], MAX_LEN, 0);
-            if (n < 0)
+            while (1)
             {
-                perror("Client error receiving data");
-                return 1;
+                n = recv(sockfd[i], buffer[i], MAX_LEN, 0);
+                if (n < 0)
+                {
+                    perror("Client error receiving data");
+                    return 1;
+                }else if (n == 0)
+                {
+                    break;
+                }
+                
+                buffer[i][n] = '\0';
+                printf("Response from server: %s\n", buffer[i]);  
             }
-            buffer[i][n] = '\0';
-            printf("Response from server: %s\n", buffer[i]);
-
+            
             close(sockfd[i]);
         }
     }    
