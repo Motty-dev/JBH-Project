@@ -315,7 +315,6 @@ void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*,
     } else {
         snprintf(inner_buffer,1024, "Error: '%s' is not a valid command. Allowed commands are select, set, print, quit.\n", command);
         cb(inner_buffer, server_mode);
-
     }
 
     free(parameters);
