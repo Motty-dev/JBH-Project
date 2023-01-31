@@ -10,13 +10,11 @@
 char incorrect_lines[MAX_ERROR_LINES][1024];
 int incorrect_lines_count = 0, correct_lines_count = 0, total_lines = 0;
 
-void print_error_messages(char incorrect_lines[][1024], int num_errors, void(*cb)(char *, int), int server_mode) 
+void print_error_messages(char incorrect_lines[][1024], int num_errors) 
 {
-    char inner_buffer[1024];
     int i;
     for (i = 0; i < num_errors; i++) {
-        snprintf(inner_buffer, 1024, "\n\tError %d: %s\n", i+1, incorrect_lines[i]);
-        cb(inner_buffer, server_mode);
+        printf("\n\tError %d: %s\n", i+1, incorrect_lines[i]);
     }
 }
 
@@ -116,13 +114,11 @@ Customer parse_line(char *line_, Customer_error *err)
     return c;
 }
 
-void process_file(char *file_name, Customer **head, void(*cb)(char *, int), int server_mode) 
+void process_file(char *file_name, Customer **head) 
 {
-    char inner_buffer[1024];
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
-        strcpy(inner_buffer, "Error opening file\n");
-        cb(inner_buffer, server_mode);
+        puts("Error opening file\n");
         return;
     }
 
@@ -141,13 +137,11 @@ void process_file(char *file_name, Customer **head, void(*cb)(char *, int), int 
         total_lines++;
     }
     if(incorrect_lines_count == 0) {
-        snprintf(inner_buffer, 1024, "\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
-        cb(inner_buffer, server_mode);
+        printf("\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
     }
     else {
-        snprintf(inner_buffer, 1024, "\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
-        cb(inner_buffer, server_mode);
-        print_error_messages(incorrect_lines, incorrect_lines_count,cb, server_mode );
+        printf("\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
+        print_error_messages(incorrect_lines, incorrect_lines_count);
     }
 
     fclose(file);

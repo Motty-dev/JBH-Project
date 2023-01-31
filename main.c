@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     Customer *head = NULL;
     
-    process_file(argv[1], &head, &print_cb, SERVER_MODE );
+    process_file(argv[1], &head);
     print_list(head, &print_cb, SERVER_MODE);
 
     while (1) 

@@ -23,7 +23,7 @@ void *conn_handler(void *args)
     char buffer[MAX_LEN];
     int n;
     int new_sock = *(int*)args;
-
+    
     n = recv(new_sock, buffer, MAX_LEN, 0);
     if (n < 0)
     {
@@ -32,7 +32,7 @@ void *conn_handler(void *args)
     }
     buffer[n] = '\0';
     printf("Server received: %s\n", buffer);
-
+    
 
     //buffer logic here - string from client
 
@@ -53,9 +53,9 @@ int main(int argc, char **argv)
     struct sockaddr_in servaddr, cliaddr;
     socklen_t len = sizeof(cliaddr);
 
-    if (argc < 2)
+    if (argc < 3)
     {
-        printf("Usage: %s <port>\n", argv[0]);
+        puts("Usage: ./<file_name> <port> <file_name.txt>\n");
         return 1;
     }
 
