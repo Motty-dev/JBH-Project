@@ -98,9 +98,9 @@ int main(int argc, char **argv)
                 }
                 
                 buffer[i][n] = '\0';
-                printf("Response from server: %s\n", buffer[i]);  
+                printf("%s\n", buffer[i]);  
             }
-            
+
             close(sockfd[i]);
         }
     }    

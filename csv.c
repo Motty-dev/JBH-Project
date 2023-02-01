@@ -114,7 +114,7 @@ Customer parse_line(char *line_, Customer_error *err)
     return c;
 }
 
-void process_file(char *file_name, Customer **head) 
+void process_file(char *file_name, Customer **head, int server_flag) 
 {
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
@@ -136,13 +136,19 @@ void process_file(char *file_name, Customer **head)
         }
         total_lines++;
     }
-    if(incorrect_lines_count == 0) {
-        printf("\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
+
+    if (server_flag)
+    {
+        if(incorrect_lines_count == 0) {
+            printf("\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
+        }
+        else {
+            printf("\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
+            print_error_messages(incorrect_lines, incorrect_lines_count);
+        }
     }
-    else {
-        printf("\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
-        print_error_messages(incorrect_lines, incorrect_lines_count);
-    }
+    
+    
 
     fclose(file);
 }

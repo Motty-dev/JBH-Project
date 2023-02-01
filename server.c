@@ -20,8 +20,9 @@ typedef struct thread_args {
 void send_cb(char *buffer, int new_sock) 
 {
     // send string through socket
-    if (send(new_sock, buffer, strlen(buffer), 0) < 0) {
-        printf("Send failed\n");
+    if (send(new_sock, buffer, strlen(buffer), 0) < 0) 
+    {
+        perror("Send failed");
         return;
     }
 }
@@ -61,7 +62,8 @@ int main(int argc, char **argv)
     }
     // process file and create the list 
     Customer *head = NULL;
-    process_file(argv[2], &head);
+    int server_flag = 0;
+    process_file(argv[2], &head, server_flag);
 
     // create a socket 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);

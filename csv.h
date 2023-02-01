@@ -8,6 +8,6 @@ typedef struct {
     char message[256];
 } Customer_error;
 
-void process_file(char *file_name, Customer **head);
+void process_file(char *file_name, Customer **head, int server_flag);
 
 #endif
