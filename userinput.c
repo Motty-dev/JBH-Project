@@ -265,21 +265,6 @@ void handle_select(char *parameters, Customer *head, void(*cb)(char *, int), int
     }  
 }
 
-void menu_screen(Customer *head, char *file_name)
-{
-    char input[INPUT_BUFFER_SIZE];
-
-    //set the server to send localy if menu_screen is called
-    int server_mode = 0;
-
-    // get input from the user
-    printf("Enter a command { > select > set > print > quit }\n > ");
-    fgets(input, INPUT_BUFFER_SIZE, stdin);
-    input[strcspn(input, "\n")] = 0;
-
-    handle_input(head, input, file_name, &print_cb, server_mode);
-}
-
 void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, int), int server_mode) 
 {
     char command[16], *parameters=NULL;
@@ -318,4 +303,19 @@ void handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*,
     }
 
     free(parameters);
+}
+
+void menu_screen(Customer *head, char *file_name)
+{
+    char input[INPUT_BUFFER_SIZE];
+
+    //set the server to send localy if menu_screen is called
+    int server_mode = 0;
+
+    // get input from the user
+    printf("Enter a command { > select > set > print > quit }\n > ");
+    fgets(input, INPUT_BUFFER_SIZE, stdin);
+    input[strcspn(input, "\n")] = 0;
+
+    handle_input(head, input, file_name, &print_cb, server_mode);
 }
