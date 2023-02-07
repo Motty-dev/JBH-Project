@@ -227,6 +227,7 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
 
             insert_in_order(temp, head);
             snprintf(inner_buffer, 1024, "Debt was updated for customer: %s %s, from %.2f to %.2f\n", temp->first_name, temp->last_name, temp_s, temp->debt);
+            save_to_csv(&new_customer, file_name, cb, server_mode);
             cb(inner_buffer, server_mode);
             break;
         }

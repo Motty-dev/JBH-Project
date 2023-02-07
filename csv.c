@@ -148,7 +148,5 @@ void process_file(char *file_name, Customer **head, int server_flag)
         }
     }
     
-    
-
     fclose(file);
 }
