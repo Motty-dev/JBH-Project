@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "csv.h"
+#include "csv_parser.h"
 #include "utils.h"
 
 #define MAX_ERROR_LINES 100

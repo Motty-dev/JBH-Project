@@ -1,5 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef CUSTOMER_MANAGER
+#define CUSTOMER_MANAGER
 
 typedef struct customer {
     char first_name[30];

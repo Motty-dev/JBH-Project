@@ -5,9 +5,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include "list.h"
-#include "csv.h"
-#include "userinput.h"
+#include "customer_manager.h"
+#include "csv_parser.h"
+#include "queries.h"
 
 typedef struct thread_args {
     Customer **head; 
