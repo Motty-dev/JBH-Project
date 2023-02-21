@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include "userinput.h"
-#include "list.h"
+#include "queries.h"
+#include "customer_manager.h"
 #include "utils.h"
 
 #define INPUT_BUFFER_SIZE 256

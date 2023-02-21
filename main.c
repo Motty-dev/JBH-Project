@@ -1,6 +1,6 @@
-#include "list.h"
-#include "csv.h"
-#include "userinput.h"
+#include "customer_manager.h"
+#include "csv_parser.h"
+#include "queries.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>

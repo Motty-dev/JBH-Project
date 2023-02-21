@@ -1,7 +1,7 @@
-#ifndef CSV_H
-#define CSV_H
+#ifndef CSV_PARSER_H
+#define CSV_PARSER_H
 
-#include "list.h"
+#include "customer_manager.h"
 
 typedef struct {
     int error;

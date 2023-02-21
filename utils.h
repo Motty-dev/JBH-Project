@@ -1,7 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-
 char* toLower(char* s);
 int validate_date(char* date);
 int validate_debt(char* debt);
