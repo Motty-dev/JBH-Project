@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
+#define MAX_LEN 1024
 
 char* toLower(char* s) 
 {
@@ -32,7 +33,7 @@ int validate_date(char* date)
     return 1;
 }
 
-int validate_debt(const char* debt_str) 
+int validate_debt(char* debt_str) 
 {
     char* end;
     strtod(debt_str, &end);
@@ -84,7 +85,7 @@ int validate_debt_float(const char *debt_str)
 int validate_last_name(char* last_name) 
 {
     for (int i = 0; last_name[i]; i++) {
-        if (!isalpha(last_name[i]) && !(last_name[i] == ' ') && !(last_name[i] == '-') && !(last_name[i] == '.') && !(last_name[i] == '_') ) {
+        if (!isalpha(last_name[i]) && last_name[i] != ' ' && last_name[i] != '-' && last_name[i] != '.' && last_name[i] != '_' ) { 
             return 0;
         }
     }
@@ -200,7 +201,7 @@ int compare_date(const char *date1, char *operator, const char *date2)
 
 void extract_field_operator_value(char *input, char *field, char *operator, char *value, int *ret, void(*cb)(char *, int), int server_mode) 
 {
-    char inner_buffer[1024];
+    char inner_buffer[MAX_LEN];
 
     char *allowed_fields[] = {"first name", "second name", "telephone", "id", "debt", "date"};
     // copy the input string to a temporary buffer
@@ -284,7 +285,7 @@ void extract_field_operator_value(char *input, char *field, char *operator, char
         return;
     }
     if (!check_value(field, value)) {
-        snprintf(inner_buffer, 1024, "Error: Invalid value for field '%s'.\n", field);
+        snprintf(inner_buffer, MAX_LEN, "Error: Invalid value for field '%s'.\n", field);
         cb(inner_buffer, server_mode);
         strcpy(field, "");
         strcpy(operator, "");

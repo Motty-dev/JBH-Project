@@ -35,7 +35,7 @@ int main(int argc, char **argv)
         printf("Enter up to 5 queries, separated by newline (press send or quit to terminate):\n");
         for (i = 0; i < 6; i++) 
         {
-            char tmp_buf[1024];
+            char tmp_buf[MAX_LEN];
             fgets(tmp_buf, MAX_LEN, stdin);
             if (strncmp(tmp_buf, "send", 4) == 0) {
                 break;
