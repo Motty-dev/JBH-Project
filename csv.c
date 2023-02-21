@@ -6,8 +6,11 @@
 #include "utils.h"
 
 #define MAX_ERROR_LINES 100
+#define MAX_LEN 1024
 
-char incorrect_lines[MAX_ERROR_LINES][1024];
+typedef int (*validation_func)(char *field);
+
+char incorrect_lines[MAX_ERROR_LINES][MAX_LEN];
 int incorrect_lines_count = 0, correct_lines_count = 0, total_lines = 0;
 
 void print_error_messages(char incorrect_lines[][1024], int num_errors, void(*cb)(char *, int), int server_mode) 
@@ -15,7 +18,7 @@ void print_error_messages(char incorrect_lines[][1024], int num_errors, void(*cb
     char inner_buffer[1024];
     int i;
     for (i = 0; i < num_errors; i++) {
-        snprintf(inner_buffer, 1024, "\n\tError %d: %s\n", i+1, incorrect_lines[i]);
+        snprintf(inner_buffer,MAX_LEN , "\n\tError %d: %s\n", i+1, incorrect_lines[i]);
         cb(inner_buffer, server_mode);
     }
 }
@@ -24,93 +27,56 @@ Customer parse_line(char *line_, Customer_error *err)
 {
     char *line = line_;
     Customer c = {0};
-    char *token = strtok_r(line, ",", &line);
+    int field_num = 0;
+    validation_func func[] = {validate_first_name, validate_last_name, validate_id_number, validate_telephone, validate_date, validate_debt};
+    char *field_names[] = {"first name", "last name", "ID number", "phone", "date", "debt"};
+    char *token = strtok(line, ",");
     if (token == NULL) {
         err->error = 1;
         sprintf(err->message, "Invalid line format: Empty line");
         return c;
     }
-    // first Name
-    strncpy(c.first_name, token, sizeof(c.first_name) - 1);
-    for (int i = 0; c.first_name[i]; i++) {
-        c.first_name[i] = tolower(c.first_name[i]);
-    }
-    if(!validate_first_name(c.first_name)) {
-        err->error = 1;
-        sprintf(err->message, "Invalid first name format for customer %s", c.first_name);
-        return c;
-    }
-    // last Name
-    token = strtok_r(NULL, ",", &line);
-    if (token == NULL) {
-        err->error = 1;
-        sprintf(err->message, "Invalid line format: Missing second name field");
-        return c;
-    }
-    strncpy(c.last_name, token, sizeof(c.last_name) - 1);
-    for (int i = 0; c.last_name[i]; i++) {
-        c.last_name[i] = tolower(c.last_name[i]);
-    }
-    if(!validate_last_name(c.last_name)) {
-        err->error = 1;
-        sprintf(err->message, "Invalid second name format for customer %s", c.last_name);
-        return c;
-    }
-    // id Number
-    token = strtok_r(NULL, ",", &line);
-    if (token == NULL) {
-        err->error = 1;
-        sprintf(err->message, "Invalid line format: Missing ID Number field");
-        return c;
-    }
-    strncpy(c.id_number, token, sizeof(c.id_number) - 1);
-    if(!validate_id_number(c.id_number)) {
-        err->error = 1;
-        sprintf(err->message, "Invalid ID number format for customer %s %s, ID: %s", c.first_name, c.last_name, c.id_number);
-        return c;
-    }
-    // phone
-    token = strtok_r(NULL, ",", &line);
-    if (token == NULL) {
-        err->error = 1;
-        sprintf(err->message, "Invalid line format: Missing Phone field");
-        return c;
-    }
-    strncpy(c.phone, token, sizeof(c.phone) - 1);
-    if(!validate_telephone(c.phone)) {
-        err->error = 1;
-        sprintf(err->message, "Invalid phone number format for customer %s %s, ID: %s", c.first_name, c.last_name, c.id_number);
-        return c;
-    }
-    // date
-    token = strtok_r(NULL, ",", &line);
-    if (token == NULL) {
-        err->error = 1;
-        sprintf(err->message, "Invalid line format: Missing date field");
-        return c;
-    }
-    strncpy(c.date, token, sizeof(c.date) - 1);
-    if(!validate_date(c.date)) {
-        err->error = 1;
-        sprintf(err->message, "Invalid date format for customer %s %s, ID: %s", c.first_name, c.last_name, c.id_number);
-        return c;
-    }
-    // debt
-    token = strtok_r(NULL, ",", &line);
-    if (token == NULL) {
-        err->error = 1;
-        sprintf(err->message, "Invalid line format: Missing debt field");
-        return c;
-    }
-    if (token[0] == '-') {
-        c.debt = -1 * strtof(token + 1, NULL);
-    } else {
-        c.debt = strtof(token, NULL);
-    }
-    if (!validate_debt(token)) {
-        err->error = 1;
-        sprintf(err->message, "Invalid debt format for customer %s %s, ID: %s", c.first_name, c.last_name, c.id_number);
-        return c;
+    while (token != NULL)
+    {
+        switch (field_num)
+        {
+            case 0:
+                strncpy(c.first_name, token, sizeof(c.first_name) - 1);
+                for (int i = 0; c.first_name[i]; i++) {
+                    c.first_name[i] = tolower(c.first_name[i]);
+                }
+                break;
+            case 1:
+                strncpy(c.last_name, token, sizeof(c.last_name) - 1);
+                for (int i = 0; c.last_name[i]; i++) {
+                    c.last_name[i] = tolower(c.last_name[i]);
+                }
+                break;
+            case 2:
+                strncpy(c.id_number, token, sizeof(c.id_number) - 1);
+                break;
+            case 3:
+                strncpy(c.phone, token, sizeof(c.phone) - 1);
+                break;
+            case 4:
+                strncpy(c.date, token, sizeof(c.date) - 1);
+                break;
+            case 5:
+                if (token[0] == '-') {
+                    c.debt = -1 * strtof(token + 1, NULL);
+                } else {
+                    c.debt = strtof(token, NULL);
+                }
+                break;
+        }
+        if (!func[field_num](token))
+        {
+            err->error = 1;
+            sprintf(err->message, "Invalid %s format for customer %s %s, ID: %s", field_names[field_num], c.first_name, c.last_name, c.id_number);
+            return c;
+        }
+        token = strtok(NULL, ",");
+        field_num++;
     }
     err->error = 0;
     return c;
@@ -126,7 +92,7 @@ void process_file(char *file_name, Customer **head, void(*cb)(char *, int), int 
         return;
     }
 
-    char line[1024];
+    char line[MAX_LEN];
     while (fgets(line, sizeof(line), file)) 
     {
         Customer_error err = {0, ""};
@@ -140,14 +106,17 @@ void process_file(char *file_name, Customer **head, void(*cb)(char *, int), int 
         }
         total_lines++;
     }
-    if(incorrect_lines_count == 0) {
-        snprintf(inner_buffer, 1024, "\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
-        cb(inner_buffer, server_mode);
-    }
-    else {
-        snprintf(inner_buffer, 1024, "\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
-        cb(inner_buffer, server_mode);
-        print_error_messages(incorrect_lines, incorrect_lines_count,cb, server_mode );
+    if (server_mode)
+    {
+        if(incorrect_lines_count == 0) {
+            snprintf(inner_buffer, MAX_LEN, "\n\nProcessed %d out of %d lines successfully.\n", correct_lines_count, total_lines);
+            cb(inner_buffer, server_mode);
+        }
+        else {
+            snprintf(inner_buffer, 1024, "\nProcessed %d out of %d lines successfully, and %d lines with the following errors:\n", correct_lines_count, total_lines, incorrect_lines_count);
+            cb(inner_buffer, server_mode);
+            print_error_messages(incorrect_lines, incorrect_lines_count,cb, server_mode );
+        }
     }
 
     fclose(file);

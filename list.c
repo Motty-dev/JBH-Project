@@ -4,6 +4,8 @@
 #include "list.h"
 #include "utils.h"
 
+#define MAX_LEN 1024
+
 void insert_in_order(Customer *c, Customer **head) 
 {
     Customer *temp = *head;
@@ -64,7 +66,7 @@ void build_list(Customer c, Customer **head)
 
 void print_list(Customer *head, void(*cb)(char *, int), int server_mode) 
 {
-    char inner_buffer[1024];
+    char inner_buffer[MAX_LEN];
     cb("\n******************************************************************************\n", server_mode);
     cb("***************                                                ***************\n", server_mode);
     cb("************              List of customers's debts               ************\n", server_mode);
@@ -77,7 +79,7 @@ void print_list(Customer *head, void(*cb)(char *, int), int server_mode)
     Customer *temp = head;
 
     while (temp != NULL) {
-        snprintf(inner_buffer, 1024, "| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
+        snprintf(inner_buffer, MAX_LEN, "| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
         cb(inner_buffer, server_mode);
         cb("+-----+----------------+------------+----------------+----------+------------+\n", server_mode);
         temp = temp->next;
