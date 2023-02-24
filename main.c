@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     int server_flag = 1, exit = 0;
     
     process_file(argv[1], &head, server_flag);
-    print_list(head, &print_cb, SERVER_MODE);
+    print_list(head, print_cb, SERVER_MODE);
 
     while (!exit) 
     {   

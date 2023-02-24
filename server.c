@@ -43,7 +43,7 @@ void *conn_handler(void *args)
     printf("Server received: %s\n", buffer);
     
     //buffer logic here - string from client
-    handle_input(*targs->head, buffer, targs->file_name, &send_cb, targs->new_sock);
+    handle_input(*targs->head, buffer, targs->file_name, send_cb, targs->new_sock);
 exit:
     close(targs->new_sock);
     return NULL;
