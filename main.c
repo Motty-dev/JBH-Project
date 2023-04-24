@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     while (!exit) 
     {   
-        exit = menu_screen(head, argv[1]);
+        exit = menu_screen(&head, argv[1]);
     }
 
     free_list(head);

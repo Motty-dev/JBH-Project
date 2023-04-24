@@ -21,13 +21,12 @@ void print_error_messages(char incorrect_lines[][MAX_LEN], int num_errors)
     }
 }
 
-Customer parse_line(char *line_, Customer_error *err) 
+Customer parse_line(char *line, Customer_error *err) 
 {
-    char *line = line_;
-    Customer c = {0};
+    Customer c = {};
     int field_num = 0;
     validation_func func[] = {validate_first_name, validate_last_name, validate_id_number, validate_telephone, validate_date, validate_debt};
-    char *field_names[] = {"first name", "last name", "ID number", "phone", "date", "debt"};
+    const char *field_names[] = {"first name", "last name", "ID number", "phone", "date", "debt"};
     char *token = strtok(line, ",");
     if (token == NULL) {
         err->error = 1;
@@ -60,11 +59,7 @@ Customer parse_line(char *line_, Customer_error *err)
                 strncpy(c.date, token, sizeof(c.date) - 1);
                 break;
             case 5:
-                if (token[0] == '-') {
-                    c.debt = -1 * strtof(token + 1, NULL);
-                } else {
-                    c.debt = strtof(token, NULL);
-                }
+                c.debt = strtof(token, NULL);
                 break;
         }
         if (!func[field_num](token))
@@ -94,7 +89,7 @@ void process_file(char *file_name, Customer **head, int server_flag)
         Customer_error err = {0, ""};
         Customer curr = parse_line(line, &err);
         if (!err.error) {
-            build_list(curr, head);
+            build_list(&curr, head);
             correct_lines_count++;
         } else {
             strcpy(incorrect_lines[incorrect_lines_count], err.message);

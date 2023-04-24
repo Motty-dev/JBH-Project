@@ -1,9 +1,12 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#define __USE_XOPEN
+#define _GNU_SOURCE
 #include <time.h>
 #include <stdlib.h>
 #include "utils.h"
+
 
 #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
 #define MAX_LEN 1024

@@ -236,7 +236,7 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*, 
         temp = temp->next;
     }
     if (!found) {
-        build_list(new_customer, head);
+        build_list(&new_customer, head);
         save_to_csv(&new_customer, file_name, cb, server_mode);
         puts("Added to list!");
     }
@@ -267,7 +267,7 @@ void handle_select(char *parameters, Customer *head, void(*cb)(char *, int), int
     }  
 }
 
-int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, int), int server_mode) 
+int handle_input(Customer **head, char *input, char *file_name, void(*cb)(char*, int), int server_mode) 
 {
     char command[16], *parameters=NULL;
     char inner_buffer[MAX_LEN];
@@ -292,11 +292,11 @@ int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, 
     parameters[len] = '\0';
 
     if (strcmp(command, "select") == 0) {
-        handle_select(parameters, head, cb, server_mode);
+        handle_select(parameters, *head, cb, server_mode);
     } else if (strcmp(command, "set") == 0) {
-        handle_set(parameters, &head, file_name, cb, server_mode);
+        handle_set(parameters, head, file_name, cb, server_mode);
     } else if (strcmp(command, "print") == 0) {
-        print_list(head, cb, server_mode);
+        print_list(*head, cb, server_mode);
     } else if (strcmp(command, "quit") == 0) {
         return 1;
     } else {
@@ -308,7 +308,7 @@ int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, 
     return 0;
 }
 
-int menu_screen(Customer *head, char *file_name)
+int menu_screen(Customer **head, char *file_name)
 {
     char input[INPUT_BUFFER_SIZE];
 
