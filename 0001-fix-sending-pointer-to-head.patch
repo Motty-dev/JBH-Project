@@ -1,0 +1,224 @@
+From b9edf412fc2b3fb35ef8aa275de590c3e1082498 Mon Sep 17 00:00:00 2001
+From: Shaul Triebitz <shaul.triebitz@gmail.com>
+Date: Mon, 24 Apr 2023 09:58:14 +0300
+Subject: [PATCH] fix sending pointer to head
+
+---
+ csv_parser.c       | 15 +++++----------
+ customer_manager.c | 17 +++++++++--------
+ customer_manager.h |  2 +-
+ main.c             |  2 +-
+ queries.c          | 12 ++++++------
+ queries.h          |  4 ++--
+ utils.c            |  3 +++
+ 7 files changed, 27 insertions(+), 28 deletions(-)
+
+diff --git a/csv_parser.c b/csv_parser.c
+index 4ff620c..4563786 100644
+--- a/csv_parser.c
++++ b/csv_parser.c
+@@ -21,13 +21,12 @@ void print_error_messages(char incorrect_lines[][MAX_LEN], int num_errors)
+     }
+ }
+ 
+-Customer parse_line(char *line_, Customer_error *err) 
++Customer parse_line(char *line, Customer_error *err) 
+ {
+-    char *line = line_;
+-    Customer c = {0};
++    Customer c = {};
+     int field_num = 0;
+     validation_func func[] = {validate_first_name, validate_last_name, validate_id_number, validate_telephone, validate_date, validate_debt};
+-    char *field_names[] = {"first name", "last name", "ID number", "phone", "date", "debt"};
++    const char *field_names[] = {"first name", "last name", "ID number", "phone", "date", "debt"};
+     char *token = strtok(line, ",");
+     if (token == NULL) {
+         err->error = 1;
+@@ -60,11 +59,7 @@ Customer parse_line(char *line_, Customer_error *err)
+                 strncpy(c.date, token, sizeof(c.date) - 1);
+                 break;
+             case 5:
+-                if (token[0] == '-') {
+-                    c.debt = -1 * strtof(token + 1, NULL);
+-                } else {
+-                    c.debt = strtof(token, NULL);
+-                }
++                c.debt = strtof(token, NULL);
+                 break;
+         }
+         if (!func[field_num](token))
+@@ -94,7 +89,7 @@ void process_file(char *file_name, Customer **head, int server_flag)
+         Customer_error err = {0, ""};
+         Customer curr = parse_line(line, &err);
+         if (!err.error) {
+-            build_list(curr, head);
++            build_list(&curr, head);
+             correct_lines_count++;
+         } else {
+             strcpy(incorrect_lines[incorrect_lines_count], err.message);
+diff --git a/customer_manager.c b/customer_manager.c
+index feec3d3..1b77aa9 100644
+--- a/customer_manager.c
++++ b/customer_manager.c
+@@ -25,7 +25,7 @@ void insert_in_order(Customer *c, Customer **head)
+     }
+ }
+ 
+-void build_list(Customer c, Customer **head) 
++void build_list(Customer *c, Customer **head) 
+ {
+     Customer *temp = *head;
+     Customer *prev = NULL;
+@@ -33,7 +33,7 @@ void build_list(Customer c, Customer **head)
+     // check if customer is already in the list (with id and name)
+     while (temp != NULL) {
+ 
+-        if (strcasecmp(temp->id_number, c.id_number) == 0 && strcasecmp(temp->first_name, c.first_name) == 0 && strcasecmp(temp->last_name, c.last_name) == 0) {
++        if (strcasecmp(temp->id_number, c->id_number) == 0 && strcasecmp(temp->first_name, c->first_name) == 0 && strcasecmp(temp->last_name, c->last_name) == 0) {
+             found = 1;
+             break;
+         }
+@@ -43,10 +43,10 @@ void build_list(Customer c, Customer **head)
+ 
+     if (found) {
+         // update customer's debt and date 
+-        temp->debt += c.debt;
+-        if (compare_date(c.date, ">", temp->date))
++        temp->debt += c->debt;
++        if (compare_date(c->date, ">", temp->date))
+         {
+-            strcpy(temp->date, c.date);
++            strcpy(temp->date, c->date);
+         }
+         // remove node from list and re-insert in correct position
+         if (prev == NULL) {
+@@ -58,8 +58,8 @@ void build_list(Customer c, Customer **head)
+     } else {
+         // create new node and insert in correct position (by debt) 
+         // NOTE: casting is not a must. i used it for safty.
+-        Customer *new_node = (Customer*)malloc(sizeof(Customer));
+-        *new_node = c;
++        Customer *new_node = malloc(sizeof(Customer));
++        *new_node = *c;
+         insert_in_order(new_node, head);
+     }
+ }
+@@ -79,7 +79,8 @@ void print_list(Customer *head, void(*cb)(char *, int), int server_mode)
+     Customer *temp = head;
+ 
+     while (temp != NULL) {
+-        snprintf(inner_buffer, MAX_LEN, "| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n", i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
++        snprintf(inner_buffer, sizeof(inner_buffer), "| %-3d | %-5s %-8s | %-10s | %-12s   | %-8.2lf | %-10s |\n",
++                 i++, temp->first_name, temp->last_name, temp->id_number, temp->phone, temp->debt,temp->date);
+         cb(inner_buffer, server_mode);
+         temp = temp->next;
+     }
+diff --git a/customer_manager.h b/customer_manager.h
+index 44bd6a0..9ca3c65 100644
+--- a/customer_manager.h
++++ b/customer_manager.h
+@@ -13,7 +13,7 @@ typedef struct customer {
+ 
+ void free_list(Customer *head);
+ void print_list(Customer *head, void(*cb)(char *, int), int server_mode);
+-void build_list(Customer c, Customer **head);
++void build_list(Customer *c, Customer **head);
+ void insert_in_order(Customer *c, Customer **head);
+ 
+ #endif
+\ No newline at end of file
+diff --git a/main.c b/main.c
+index 8beeb27..29d377e 100644
+--- a/main.c
++++ b/main.c
+@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
+ 
+     while (!exit) 
+     {   
+-        exit = menu_screen(head, argv[1]);
++        exit = menu_screen(&head, argv[1]);
+     }
+ 
+     free_list(head);
+diff --git a/queries.c b/queries.c
+index 26769af..b6112e9 100644
+--- a/queries.c
++++ b/queries.c
+@@ -236,7 +236,7 @@ void handle_set(char *input, Customer **head, char *file_name, void(*cb)(char*,
+         temp = temp->next;
+     }
+     if (!found) {
+-        build_list(new_customer, head);
++        build_list(&new_customer, head);
+         save_to_csv(&new_customer, file_name, cb, server_mode);
+         puts("Added to list!");
+     }
+@@ -267,7 +267,7 @@ void handle_select(char *parameters, Customer *head, void(*cb)(char *, int), int
+     }  
+ }
+ 
+-int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, int), int server_mode) 
++int handle_input(Customer **head, char *input, char *file_name, void(*cb)(char*, int), int server_mode) 
+ {
+     char command[16], *parameters=NULL;
+     char inner_buffer[MAX_LEN];
+@@ -292,11 +292,11 @@ int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*,
+     parameters[len] = '\0';
+ 
+     if (strcmp(command, "select") == 0) {
+-        handle_select(parameters, head, cb, server_mode);
++        handle_select(parameters, *head, cb, server_mode);
+     } else if (strcmp(command, "set") == 0) {
+-        handle_set(parameters, &head, file_name, cb, server_mode);
++        handle_set(parameters, head, file_name, cb, server_mode);
+     } else if (strcmp(command, "print") == 0) {
+-        print_list(head, cb, server_mode);
++        print_list(*head, cb, server_mode);
+     } else if (strcmp(command, "quit") == 0) {
+         return 1;
+     } else {
+@@ -308,7 +308,7 @@ int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*,
+     return 0;
+ }
+ 
+-int menu_screen(Customer *head, char *file_name)
++int menu_screen(Customer **head, char *file_name)
+ {
+     char input[INPUT_BUFFER_SIZE];
+ 
+diff --git a/queries.h b/queries.h
+index 330597a..ad3a18c 100644
+--- a/queries.h
++++ b/queries.h
+@@ -3,7 +3,7 @@
+ 
+ #include "customer_manager.h"
+ 
+-int menu_screen(Customer *head, char *file_name);
+-int handle_input(Customer *head, char *input, char *file_name, void(*cb)(char*, int), int server_mode);
++int menu_screen(Customer **head, char *file_name);
++int handle_input(Customer **head, char *input, char *file_name, void(*cb)(char*, int), int server_mode);
+ 
+ #endif
+\ No newline at end of file
+diff --git a/utils.c b/utils.c
+index 9498df2..908bc56 100644
+--- a/utils.c
++++ b/utils.c
+@@ -1,10 +1,13 @@
+ #include <ctype.h>
+ #include <string.h>
+ #include <stdio.h>
++#define __USE_XOPEN
++#define _GNU_SOURCE
+ #include <time.h>
+ #include <stdlib.h>
+ #include "utils.h"
+ 
++
+ #define ARR_LEN(_arr) (sizeof(_arr)/sizeof(_arr[0]))
+ #define MAX_LEN 1024
+ 
+-- 
+2.25.1
+
